@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.czf.dao.DeliverDao">
+    <resultMap id="ResultMap" type="com.czf.model.Deliver">
+        <id column="dr_id" jdbcType="INTEGER" property="id"/>
+        <result column="dr_username" jdbcType="VARCHAR" property="deliverName"/>
+        <result column="dr_phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="dr_password" jdbcType="VARCHAR" property="deliverPassWord"/>
+        <result column="dr_sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="dr_total_num" jdbcType="INTEGER" property="totalName"/>
+        <result column="dr_status" jdbcType="INTEGER" property="status"/>
+        <result column="dr_role" jdbcType="VARCHAR" property="role"/>
+        <result column="dr_add_time" jdbcType="TIMESTAMP" property="addTime"/>
+        <result column="dr_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        dr_id, dr_username, dr_phone, dr_password, dr_sex, dr_total_num, dr_status, dr_role, dr_add_time, dr_update_time
+    </sql>
+
+    <!-- 查询所有用户 -->
+    <select id="findAllDeliver" parameterType="Deliver" resultMap="ResultMap">
+        select * from Deliver
+    </select>
+
+    <!-- 查找用户是否存在 -->
+    <select id="findByDeliverName" resultType="java.lang.Integer">
+        select count(*) from Deliver where dr_username = #{deliverName,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据id查询配送员 -->
+    <select id="getByDeliverId" parameterType="java.lang.Integer" resultMap="ResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from Deliver
+        where dr_id = #{id, jdbcType=INTEGER}
+    </select>
+
+    <!-- 添加新配送员 -->
+    <insert id="insertDeliver" parameterType="Deliver">
+        insert into Deliver
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deliverName != null">
+                dr_username,
+            </if>
+            <if test="phone != null">
+                dr_phone,
+            </if>
+            <if test="deliverPassWord != null">
+                dr_password,
+            </if>
+            <if test="sex != null">
+                dr_sex,
+            </if>
+            <if test="totalName != null">
+                dr_total_num,
+            </if>
+            <if test="status != null">
+                dr_status,
+            </if>
+            <if test="role != null">
+                dr_role,
+            </if>
+            <if test="addTime != null">
+                dr_add_time,
+            </if>
+            <if test="updateTime != null">
+                dr_update_time
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deliverName != null">
+                #{deliverName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="deliverPassWord != null">
+                #{deliverPassWord,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="totalName != null">
+                #{totalName,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="role != null">
+                #{role,jdbcType=VARCHAR},
+            </if>
+            <if test="addTime != null">
+                #{addTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 配送员更新 -->
+    <update id="updateDeliver" parameterType="Deliver">
+        update Deliver
+        <set>
+            <if test="deliverName != null">
+                dr_username = #{deliverName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                dr_phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="deliverPassWord != null">
+                dr_password = #{deliverPassWord ,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                dr_sex = #{sex ,jdbcType=VARCHAR},
+            </if>
+            <if test="totalName != null">
+                dr_total_num = #{totalName ,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                dr_status = #{status,jdbcType=INTEGER},
+            </if><if test="role != null">
+                dr_role = #{role ,jdbcType=VARCHAR},
+            </if>
+            <if test="addTime != null">
+                dr_add_time = #{addTime ,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                dr_update_time = #{updateTime ,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where dr_id = #{id, jdbcType=INTEGER}
+    </update>
+
+    <!-- 模糊查询 -->
+    <select id="findDeliversByParams" parameterType="Deliver" resultMap="ResultMap">
+        <!--select <include refid="Base_Column_List"/>-->
+        select * from Deliver
+        <where>
+            <if test="deliverName != null and deliverName != ''">
+                and dr_username like concat(concat('%',#{deliverName}),'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and dr_phone = #{phone}
+            </if>
+        </where>
+    </select>
+
+    <!-- 删除单个配送员 -->
+    <delete id="deleteByDeliverId" parameterType="java.lang.Integer">
+        delete from Deliver
+        where dr_id = #{id, jdbcType=INTEGER}
+    </delete>
+
+    <!-- 删除多个配送员 -->
+    <delete id="deleteByManyDeliverId" parameterType="java.lang.Integer">
+        delete from Deliver
+        where dr_id in
+        <foreach collection="array" item="ids" index="no" open="(" separator="," close=")">
+            #{ids, jdbcType=INTEGER}
+        </foreach>
+    </delete>
+
+
+
+
+
+
+
+
+</mapper>

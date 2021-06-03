@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--设置dao接口-->
+<mapper namespace="com.czf.dao.OrderDao">
+
+    <resultMap id="OrderMap" type="Order">
+        <id property="id" column="id"/>
+        <result property="price" column="price"/>
+        <result property="createDate" column="create_date"/>
+        <result property="status" column="status"/>
+        <result property="address" column="address"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="customerId" column="customer_id"/>
+        <result property="productNumber" column="product_number"/>
+        <association property="user" column="user" javaType="User">
+            <id property="id" column="uu_id" />
+            <result property="userName" column="uu_username" />
+            <result property="phone" column="uu_phone" />
+        </association>
+        <!--<association property="orderItem" column="orderItem" javaType="OrderItem">
+            <id property="id" column="id"/>
+            <result property="price" column="price"/>
+            <result property="num" column="num"/>
+            <result property="address" column="address"/>
+        </association>-->
+        <association property="comment" column="comment" javaType="Comment">
+            <id property="id" column="id" />
+            <id property="orderNumber" column="order_number" />
+            <result property="userId" column="user_id" />
+            <result property="userName" column="user_name" />
+            <result property="deliverId" column="deliver_id" />  <!-- id userId deliverId orderId comment status createTime -->
+            <result property="deliverName" column="deliver_name" />
+            <result property="orderId" column="order_id" />
+            <result property="comment" column="comment" />
+            <result property="commentStatus" column="c_status" />
+            <result property="createTime" column="create_time" />
+            <result property="endTime" column="end_time" />
+        </association>
+    </resultMap>
+
+    <sql id="OrderColumn">
+        id,
+        order_number,
+        customer_id,
+        price,
+        create_date,
+        product_number,
+        status,
+        address
+    </sql>
+
+    <!-- 查询所有 -->
+    <select id="getAllOrdersToAll" resultMap="OrderMap">
+        select * from shop_order
+    </select>
+
+    <!-- 管理员获取一个订单 -->
+    <select id="getOneOrderByAdminAndOrderId" resultMap="OrderMap">
+        select t.id, t.order_number, t.customer_id, t.price, t.create_date, t.product_number, t.status, t.address, p.id 'p.id', p.c_status,
+                u.uu_id 'u.uu_id', u.uu_username, u.uu_phone
+        from shop_order t
+        left join User u on t.customer_id = u.uu_id
+        left join shop_comment p on p.order_id = t.id
+        where t.id = #{orderId}
+    </select>
+
+    <!-- 管理员/配送员：获取所有订单详情 -->
+    <select id="getUserAllOrdersByAdminOrDeliver" resultMap="OrderMap">
+        select t.id, t.order_number, t.customer_id, t.price, t.create_date, t.product_number, t.status, t.address, p.id 'p.id', p.c_status,
+                u.uu_id 'u.uu_id', u.uu_username, u.uu_phone
+        from shop_order t
+        left join User u on t.customer_id = u.uu_id
+        left join shop_comment p on p.order_id = t.id
+        order by t.id
+    </select>
+
+    <!-- 模糊查询 -->
+    <select id="findOrdersByParams" parameterType="Order" resultMap="OrderMap">
+        select t.id, t.order_number, t.customer_id, t.price, t.create_date, t.product_number, t.status, t.address, p.id 'p.id', p.c_status,
+                u.uu_id 'u.uu_id', u.uu_username, u.uu_phone
+        from shop_order t
+        left join User u on t.customer_id = u.uu_id
+        left join shop_comment p on p.order_id = t.id
+        <where>
+            <if test="orderNumber != null and orderNumber != ''">
+                and t.order_number like concat(concat('%',#{orderNumber}),'%')
+            </if>
+        </where>
+        order by t.id
+    </select>
+
+    <!-- 配送员查找所有用户的支付订单 -->
+    <select id="getAllOrdersToDeliver" resultMap="OrderMap">
+        select o.id,o.order_number, o.customer_id,o.price,o.create_date,o.address,o.product_number,o.status,
+                t.uu_id 't.uu_id', t.uu_username, t.uu_phone
+        from shop_order o
+        left join User t on o.customer_id = t.uu_id
+        where o.status != 5
+        order by t.uu_id
+    </select>
+
+    <!-- 管理员根据订单id、用户id 查找所有配送订单，无输入值 -->
+    <select id="getUserAllOrdersByAdminAndOrderIdAndUserId" resultMap="OrderMap">
+        select t.id, t.customer_id, t.order_number, t.price, t.product_number, t.status, t.address, u.uu_id 'u.uu_id', u.uu_username,
+                c.id 'c.id', c.order_number, c.user_id, c.user_name, c.deliver_id, c.deliver_name, c.order_id, c.comment, c.c_status, c.create_time, c.end_time
+        from shop_order t
+        left join shop_comment c on t.order_number = c.order_number
+        left join User u on t.customer_id = u.uu_id
+        order by c.user_id
+    </select>
+
+    <!-- 获取用户的所有订单 -->
+    <select id="getUserAllOrdersByUserId" resultMap="OrderMap">
+        select o.id,o.order_number, o.customer_id,o.price,o.create_date,o.address,o.product_number,o.status,
+                t.uu_id 't.uu_id', t.uu_username, c.id 'c.id', c.c_status, c.comment
+        from shop_order o
+        left join User t on o.customer_id = t.uu_id
+        left join shop_comment c on o.id = c.order_id
+        where o.customer_id = #{userId} and o.status != 5
+          order by o.create_date desc
+    </select>
+
+    <!-- 根据用户id，获取用户的所有订单及用户信息 -->
+    <select id="getUserAllOrdersAndUserByUserId" resultMap="OrderMap">
+        select o.id,o.order_number,o.price,o.create_date,o.address,o.product_number,o.status,t.uu_id,t.uu_username
+        from shop_order o
+        left join User t on o.customer_id = t.uu_id
+        where o.customer_id = #{userId}
+          order by o.create_date desc
+    </select>
+
+    <!-- 根据订单id获取订单所有信息 -->
+    <select id="getOneOrderByOrderId" resultMap="OrderMap">
+        select o.id,o.order_number,o.price,o.create_date,o.address,o.product_number,o.status, t.id 't.id', t.user_name, t.deliver_name, t.c_status, t.comment, t.create_time, t.end_time
+        from shop_order o
+        left join shop_comment t on o.id = t.order_id
+        where o.id = #{orderId}
+    </select>
+
+    <!-- 获取订单不同状态下的所有订单详情 -->
+    <select id="getUserOrdersByUserId" resultMap="OrderMap">
+        select o.id,o.order_number,o.price,o.create_date,o.address,o.product_number,o.status,  c.id 'c.id', c.c_status, c.comment
+        from shop_order o
+        left join User t on o.customer_id = t.uu_id
+        left join shop_comment c on o.id = c.order_id
+        where o.customer_id = #{userId} and o.status = #{status}
+          order by o.create_date desc
+    </select>
+
+    <!-- 根据用户的id 和 订单的编号 查询一个订单 -->
+    <select id="findOneOrderByOrderNoAndUserId" resultMap="OrderMap">
+      select o.id,o.order_number,o.price,o.create_date,o.address,o.product_number,o.status,c.uu_id 'c.uu_id',c.uu_username, c.uu_phone
+        from shop_order o
+        left join User c ON o.customer_id = c.uu_id
+      where order_number = #{orderNo} and customer_id = #{userId} and o.status != 5
+        order by o.create_date desc
+    </select>
+
+    <!-- 插入订单  -->
+    <insert id="insertOrder" parameterType="Order" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into shop_order
+          (order_number, customer_id, price, create_date, product_number, status, address)
+        values
+          (#{orderNumber},#{user.id},#{price},#{createDate},#{productNumber},#{status},#{address})
+    </insert>
+
+    <!-- 支付支付完成，更新订单状态码 为 1 -->
+    <update id="updateOrderStatusByUserId">
+        update shop_order
+        set status = #{status}
+        where order_number = #{orderNumber} and customer_id = #{userId}
+    </update>
+
+    <!-- 付宝异步通知，修改订单状态，异步通知session失效 ，状态码 为 1-->
+    <update id="updateOrderStatusByOrderNo">
+        update shop_order
+        set status = #{status}
+        where order_number = #{orderNumber}
+    </update>
+
+    <!-- 取消、删除、确认收货订单  三合一  配送员 状态修改合集 -->
+   <update id="updateUserOrderStatusByUserIdAndOrderId">
+        update shop_order
+          set status = #{status}
+        where id = #{orderId} and customer_id = #{userId}
+    </update>
+
+    <update id="updateOrderByAdmin">
+        update shop_order
+          set address = #{address}
+        where id = #{orderId}
+    </update>
+
+</mapper>

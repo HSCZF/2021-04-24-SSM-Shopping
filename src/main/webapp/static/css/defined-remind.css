@@ -1,0 +1,86 @@
+.label:empty {
+    display: none;
+}
+
+a.label:hover {
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.label-important {
+    background-color: #b94a48;
+}
+
+.label-important[href] {
+    background-color: #953b39;
+}
+
+.label-inverse {
+    color: #0e0e0e;
+}
+
+.label-inverse[href] {
+    background-color: #1a1a1a;
+}
+
+/*.span12{
+    width: 950px;
+    text-align: center;
+}*/
+
+.span9 {
+    width: 700px;
+    text-align: center;
+}
+
+.span3 {
+    width: 220px;
+    text-align: center;
+}
+
+.span1 {
+    width: 60px;
+    text-align: center;
+}
+
+.row-fluid {
+    width: 100%;
+    *zoom: 1;
+}
+
+.row-fluid:before,
+.row-fluid:after {
+    display: table;
+    line-height: 0;
+    content: "";
+}
+
+.row-fluid:after {
+    clear: both;
+}
+
+.row-fluid [class*="span"] {
+    display: block;
+    float: left;
+    width: 100%;
+    min-height: 30px;
+    margin-left: 2.127659574468085%;
+    *margin-left: 2.074468085106383%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.row-fluid [class*="span"]:first-child {
+    margin-left: 0;
+}
+
+.row-fluid .controls-row [class*="span"] + [class*="span"] {
+    margin-left: 2.127659574468085%;
+}
+
+.row-fluid .span3 {
+    width: 23.404255319148934%;
+    *width: 23.351063829787233%;
+}

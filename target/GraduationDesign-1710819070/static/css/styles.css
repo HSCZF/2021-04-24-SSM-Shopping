@@ -1,0 +1,187 @@
+body {
+    background-color: #f6f6f6;
+    font-family: Lato;
+}
+/*版权所有*/
+body p {
+    font-size: 0.9em;
+}
+
+body h1, body h2, body h3, body h4, body h5, body h6 {
+    text-transform: uppercase;
+    font-weight: 300;
+}
+
+#logo {
+    color: #333;
+}
+
+.page {
+    width: 980px;
+    margin: auto;
+    background-color: #FFF;
+    border-radius: 6px;
+    margin-top: -70px;
+    padding: 20px 0px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.page .header {
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #EEE;
+}
+
+@media (min-width: 1200px) {
+    .page {
+        width: 1210px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+    .page {
+        width: 764px;
+    }
+}
+
+@media (max-width: 767px) {
+    body {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .page {
+        width: 100%;
+    }
+
+    .page-container {
+        padding: 0px 20px;
+    }
+
+    #in-nav ul.pull-right {
+        top: 0px !important;
+    }
+
+    .message-sidebar {
+        margin-right: -20px !important;
+    }
+}
+
+#in-nav {
+    background-color: white;
+    background-repeat: repeat;
+    height: 50px;
+    padding-top: 10px;
+}
+
+#in-nav ul {
+    position: relative;
+    top: 10px;
+}
+
+#in-nav ul li {
+    list-style-type: none;
+    display: inline;
+}
+
+#in-nav ul li a {
+    padding: 10px;
+}
+
+#in-sub-nav {
+    background-color: #333333;
+    -moz-box-shadow: inset 0px 0px 10px #111111;
+    -webkit-box-shadow: inset 0px 0px 10px #111111;
+    box-shadow: inset 0px 0px 10px #111111;
+}
+
+#in-sub-nav ul {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+#in-sub-nav li {
+    list-style-type: none;
+    display: inline-block;
+}
+
+#in-sub-nav li a {
+    display: block;
+    border-radius: 6px;
+    padding: 15px 10px 5px;
+    min-height: 56px;
+    min-width: 64px;
+    margin: 20px 10px 10px;
+    color: #FFF;
+    font-weight: 100;
+}
+
+#in-sub-nav li a:hover, #in-sub-nav li a.active {
+    background-color: #555;
+    text-decoration: none;
+}
+
+#in-sub-nav li span.label.pull-right {
+    position: relative;
+    top: 24px;
+    right: 14px;
+}
+
+/*github账号登录下载的，阿里图标颜色样式 */
+.iconfont{
+    color: #0044cc;
+}
+
+footer {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    color: #999;
+}
+
+footer a {
+    color: #999;
+}
+
+/* ============== sidebar ============== */
+.sidebar {
+    border-top: 1px solid #EEE;
+}
+
+.sidebar ul {
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    list-style-type: none;
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 10px;
+    border-bottom: 1px solid #EEE;
+    text-transform: uppercase;
+}
+
+.sidebar ul li a:hover {
+    background-color: #EEE;
+    text-decoration: none;
+}
+
+.sidebar ul li ul {
+    background-color: #F6F6F6;
+    box-shadow: inset 0 1px 10px #E0E0E0;
+}
+
+.knob {
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    #events {
+        overflow: auto;
+        height: 600px;
+    }
+}
+
+

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--设置dao接口-->
+<mapper namespace="com.czf.dao.ShopDao">
+
+    <sql id="ShopColumn">
+        id,
+        customer_id,
+        receiver_name,
+        receiver_phone,
+        receiver_mobile,
+        receiver_city,
+        receiver_province,
+        receiver_district,
+        zip_code,
+        create_time,
+        update_time,
+        status,
+        address_detail
+    </sql>
+
+    <!-- 添加用户的新配送地址 -->
+    <insert id="addShop" parameterType="Shop" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
+        insert into shop
+        (customer_id, receiver_name, receiver_phone, receiver_mobile, receiver_city, receiver_province, receiver_district, zip_code, create_time, update_time, status, address_detail)
+        values
+        (#{customerId},#{receiverName},#{receiverPhone},#{receiverMobile},#{receiverCity},#{receiverProvince},#{receiverDistrict},#{zipCode},#{createTime},#{updateTime},#{status},#{addressDetail})
+    </insert>
+
+    <!-- 查询用户的所有地址 -->
+    <select id="findUserAllShops" resultType="Shop">
+        select <include refid="ShopColumn"/>
+        from shop
+        where customer_id = #{userId} and status = #{status}
+    </select>
+
+    <!-- 显示用户的一个地址信息 -->
+    <select id="findShopByUserIdAndShopId" resultType="Shop">
+        select <include refid="ShopColumn"/>
+        from shop
+        where id = #{shopId} and customer_id = #{userId}
+    </select>
+
+    <!-- 用户修改配送地址，查询是否有这个地址的信息 -->
+    <select id="findShopAddressByUserIdAndShopId" resultType="Shop">
+        select <include refid="ShopColumn"/>
+        from shop
+        where id = #{shopId} and customer_id = #{userId}
+    </select>
+
+    <!-- 用户地址更新，因为没有用@Param传值，为了不修改数据库，不用userId，用customerId -->
+    <update id="updateByShop" parameterType="Shop">
+        update shop
+          set receiver_name = #{receiverName},
+              receiver_phone = #{receiverPhone},
+              receiver_mobile = #{receiverMobile},
+              receiver_Province = #{receiverProvince},
+              receiver_city = #{receiverCity},
+              receiver_district = #{receiverDistrict},
+              address_detail = #{addressDetail},
+              zip_code = #{zipCode},
+              update_time = #{updateTime}
+        where id = #{id} and customer_id = #{customerId}
+    </update>
+
+    <!-- 用户删除一个地址 -->
+    <update id="deleteShopAddressByShopIdAndUserId">
+        update shop
+            set status = #{status},
+                update_time = #{updateTime}
+        where id = #{shopId} and customer_id = #{userId}
+    </update>
+
+
+
+</mapper>

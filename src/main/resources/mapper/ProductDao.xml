@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.czf.dao.ProductDao">
+    <resultMap id="productMap" type="com.czf.model.Product">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="info" column="info"/>
+        <result property="image" column="image"/>
+        <result property="shopNumber" column="shop_number"/>
+        <result property="product_type_id" column="productTypeId"/>
+        <association property="productType" javaType="ProductType" column="product_type_id">
+            <id property="id" column="product_type_id"/>
+        </association>
+    </resultMap>
+
+    <!-- 多表联合查询 -->
+    <resultMap id="productMap2" type="com.czf.model.Product">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="info" column="info"/>
+        <result property="image" column="image"/>
+        <result property="shopNumber" column="shop_number"/>
+        <result property="product_type_id" column="productTypeId"/>
+        <association property="productType" javaType="ProductType" column="product_type_id">
+            <id property="id" column="pt.id"/>
+            <result property="name" column="pt.name"/>
+            <result property="status" column="status"/>
+        </association>
+    </resultMap>
+
+    <sql id="productColumn">
+        id,
+        name,
+        price,
+        info,
+        image,
+        shop_number,
+        product_type_id
+    </sql>
+
+    <select id="getAllProductByIndex" parameterType="Product" resultMap="productMap">
+        select t.id, t.name, t.price, t.info, t.image, t.shop_number, t.product_type_id, pt.id 'pt.id', pt.status
+          from shop_product t
+          join shop_product_type pt on t.product_type_id = pt.id
+        where pt.status = 1
+    </select>
+
+    <!-- 添加商品 -->
+    <insert id="insertProduct" parameterType="Product">
+        insert into shop_product
+        (name, price, info, image, shop_number,product_type_id)
+        values
+        (#{name},#{price},#{info},#{image}, #{shopNumber},#{productTypeId})
+    </insert>
+
+    <!-- 模糊查询 -->
+    <select id="selectByProductParams" parameterType="ProductParam" resultMap="productMap">
+        select t.id, t.name, t.price, t.info, t.image, t.shop_number, t.product_type_id, pt.id 'pt.id', pt.status
+          from shop_product t
+          join shop_product_type pt on t.product_type_id = pt.id
+        <where>
+            <if test="name != null and name != ''">
+                and t.name like concat(concat('%',#{name}),'%')
+            </if>
+            <if test="minPrice != null and maxPrice != null">
+                and price between #{minPrice} and #{maxPrice}
+            </if>
+            <if test="minPrice != null">
+                and price &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                and price &lt;= #{maxPrice}
+            </if>
+            <if test="productTypeId != null and productTypeId != -1">
+                and product_type_id = #{productTypeId}
+            </if>
+            and pt.status = 1
+        </where>
+    </select>
+
+    <!-- 根据商品名称查询 -->
+    <select id="selectByProductName" resultMap="productMap">
+        select <include refid="productColumn"/>
+        from shop_product
+        where name = #{name}
+    </select>
+
+    <!-- 查询所有商品 -->
+    <select id="selectAllProducts" resultMap="productMap2">
+        select  p.id,p.name,p.info,p.price,p.image,p.shop_number, p.product_type_id,pt.id 'pt.id',pt.name 'pt.name',pt.status
+        from shop_product p
+        left join shop_product_type pt on p.product_type_id = pt.id
+    </select>
+
+    <select id="selectAllProductsWithStatus" resultMap="productMap2">
+        select  p.id,p.name,p.info,p.price,p.image, p.shop_number, p.product_type_id,pt.id 'pt.id',pt.name 'pt.name',pt.status
+        from shop_product p
+        left join shop_product_type pt on p.product_type_id = pt.id
+        where pt.status = #{status}
+    </select>
+
+    <select id="selectProductById" resultMap="productMap">
+        select <include refid="productColumn"/>
+        from shop_product
+        where id = #{id}
+    </select>
+
+    <update id="updateProduct" parameterType="Product">
+        update shop_product
+        set name = #{name},
+            price = #{price},
+            info = #{info},
+            image = #{image},
+            shop_number = #{shopNumber},
+            product_type_id = #{productTypeId}
+        where id = #{id}
+    </update>
+
+    <update id="updateProductNumber" parameterType="Product">
+        update shop_product
+            set shop_number = #{shopNumber}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProductById">
+        delete from shop_product
+        where id = #{id}
+    </delete>
+
+
+</mapper>

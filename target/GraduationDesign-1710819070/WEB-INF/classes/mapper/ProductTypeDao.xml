@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.czf.dao.ProductTypeDao">
+
+    <sql id="productTypeColumn">
+        id,
+        name,
+        status
+    </sql>
+
+    <insert id="insertProductType">
+        insert into shop_product_type
+          (name,status)
+        values
+          (#{name},#{status})
+    </insert>
+
+    <select id="selectProductTypeByName" resultType="ProductType">
+        select <include refid="productTypeColumn"/>
+        from shop_product_type
+        where name = #{name}
+    </select>
+
+    <!-- 查找所有商品类型 -->
+    <select id="findAllProductTypes" resultType="ProductType">
+        select <include refid="productTypeColumn"/>
+        from shop_product_type
+    </select>
+
+    <!-- 查找所有有效的商品类型 -->
+    <select id="findAllProductTypesWithStatus" resultType="ProductType">
+        select <include refid="productTypeColumn"/>
+        from shop_product_type
+        where status = #{status}
+    </select>
+
+    <!-- 根据id查找类别 -->
+    <select id="selectProductTypeById" resultType="ProductType">
+        select <include refid="productTypeColumn"/>
+        from shop_product_type
+        where id = #{id}
+    </select>
+
+    <update id="updateName" parameterType="ProductType">
+        update shop_product_type
+        set name = #{name}
+        where id = #{id}
+    </update>
+
+    <update id="updateStatus" parameterType="java.lang.Integer">
+        update shop_product_type
+        set status = #{status}
+        where id = #{id, jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteProductTypeById" parameterType="java.lang.Integer">
+        delete from shop_product_type
+        where id = #{id}
+    </delete>
+
+
+
+
+
+
+    <select id="selectAll" resultType="ProductType">
+        select <include refid="productTypeColumn"/>
+        from shop_product_type
+    </select>
+
+
+
+    <select id="selectAllValidByStatus" resultType="ProductType">
+        select <include refid="productTypeColumn"/>
+        from shop_product_type
+        where status = #{status}
+    </select>
+
+
+
+
+
+</mapper>

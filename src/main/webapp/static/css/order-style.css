@@ -1,0 +1,32 @@
+.list-address {
+    padding-left: 5px;
+    margin-top: 15px;
+}
+
+/*地址卡片鼠标放上去的状态*/
+.list-address li:hover {
+    background-position: -480px 0;
+}
+
+/*地址卡片选中状态*/
+.list-address li.active, .list-address li.active:hover {
+    background-position: 0 0;
+}
+
+select {
+    -webkit-appearance: none;
+    height: 32px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 0 10px;
+}
+
+
+.table tbody tr td {
+    vertical-align: middle;
+}
+
+.table th {
+    text-align: center !important;
+}

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.czf.dao.CommentDao">
+
+    <resultMap id="CommentMap" type="Comment">
+        <id column="id" property="id"/>
+        <id column="order_number" property="orderNumber"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="user_address" property="userAddress"/>
+        <result column="deliver_id" property="deliverId"/>
+        <result column="deliver_name" property="deliverName"/>
+        <result column="order_id" property="orderId"/>
+        <result column="comment" property="comment"/>
+        <result column="c_status" property="commentStatus"/>
+        <result column="create_time" property="createTime"/>
+        <result column="end_time" property="endTime"/>
+    </resultMap>
+
+    <sql id="CommentColumn">
+        id,
+        order_number,
+        user_id,
+        user_name,
+        user_phone,
+        user_address,
+        deliver_id,
+        deliver_name,
+        order_id,
+        comment,
+        c_status,
+        create_time,
+        end_time
+    </sql>
+
+    <!-- 将评论插入配送订单中的评论字段 -->
+    <insert id="insertComment" parameterType="Comment" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        insert into shop_comment
+          ( id, order_number,user_id, user_name, user_phone, user_address, deliver_id, deliver_name, order_id, comment, c_status, create_time, end_time)
+        values
+          (#{id},#{orderNumber},#{userId}, #{userName}, #{userPhone},#{userAddress}, #{deliverId}, #{deliverName}, #{orderId},#{comment},#{commentStatus},#{createTime}, #{endTime})
+    </insert>
+
+    <!-- 模糊查询 -->
+    <select id="getParamsByCommentInput" parameterType="Comment" resultMap="CommentMap">
+        <!--select <include refid="Base_Column_List"/>-->
+        select * from shop_comment
+        <where>
+            <if test="orderNumber != null and orderNumber != ''">
+                and order_number like concat(concat('%',#{orderNumber}),'%')
+            </if>
+            <if test="userName != null and userName != ''">
+                and user_name like concat(concat('%',#{userName}),'%')
+            </if>
+            <if test="deliverName != null and deliverName != ''">
+                and deliver_name like concat(concat('%',#{deliverName}),'%')
+            </if>
+        </where>
+    </select>
+
+
+    <!--  id userId deliverId orderId comment status createTime   -->
+
+    <!-- 直接查询所有，附带有评论或无评论一起查 -->
+    <select id="getAllComments" parameterType="integer" resultMap="CommentMap">
+        select
+        <include refid="CommentColumn"/>
+        from shop_comment
+    </select>
+
+    <!-- 获取订单下的用户id -->
+    <select id="getOrderUserId" parameterType="java.lang.Integer" resultMap="CommentMap">
+        select <include refid="CommentColumn"/>
+        from shop_comment where order_id = #{orderId}
+    </select>
+
+    <!-- 根据配送id查询一个配送 -->
+    <select id="getOneCommentById" parameterType="java.lang.Integer" resultMap="CommentMap">
+        select <include refid="CommentColumn"/>
+        from shop_comment where id = #{id}
+    </select>
+
+    <!-- 与下方的查询不同，这里查order 根据配送员id，获取配送员订单下不同状态下的所有订单详情 -->
+    <select id="getAllCommentsByDeliverIdAndStatus" resultMap="CommentMap">
+        select
+        <include refid="CommentColumn"/>
+        from shop_comment
+        where  deliver_id = #{deliverId} and c_status = #{commentStatus}
+    </select>
+
+    <!-- 这里查comment 根据配送员id 和 订单状态不是 5 的订单 -->
+    <select id="getAllCommentsByDeliverIdAndStatusNoAll" parameterType="integer" resultMap="CommentMap">
+        select
+        <include refid="CommentColumn"/>
+        from shop_comment
+        where deliver_id = #{deliverId} and c_status != 5
+    </select>
+
+    <!-- 根据用户id 的配送订单，附带有评论或无评论一起查 -->
+    <select id="getAllCommentsUserId" parameterType="integer" resultMap="CommentMap">
+        select
+        <include refid="CommentColumn"/>
+        from shop_comment 
+        where user_id = #{userId}
+    </select>
+
+    <!-- 根据用户id 和 配送员id 的配送订单，附带有评论或无评论一起查 -->
+    <select id="getAllCommentsUserIdAndDeliverId" parameterType="integer" resultMap="CommentMap">
+        select
+        <include refid="CommentColumn"/>
+        from shop_comment 
+        where user_id = #{userId} and deliver_id = #{deliverId}
+    </select>
+
+    <!-- 根据用户id 和 订单id 的配送订单，附带有评论或无评论一起查 -->
+    <select id="getAllCommentsUserIdAndOrderId" parameterType="integer" resultMap="CommentMap">
+        select
+        <include refid="CommentColumn"/>
+        from shop_comment
+        where user_id = #{userId} and order_id = #{orderId}
+    </select>
+
+    <!-- 根据用户id、配送员id、订单id，附带有评论或无评论一起查 -->
+    <select id="getAllCommentByUserIdAndDeliverIdAndOrderId" parameterType="integer" resultMap="CommentMap">
+        select
+        <include refid="CommentColumn"/>
+        from shop_comment
+        where user_id = #{userId} and deliver_id = #{deliverId} and order_id = #{orderId}
+    </select>
+
+    <!-- 更改未配送、配送中、配送完成  三合一  配送员 状态修改合集 -->
+    <update id="updateDeliverOrderStatusByDeliverIdAndOrderId">
+        update shop_comment
+          set c_status = #{commentStatus}
+        where order_id = #{orderId} and deliver_id = #{deliverId}
+    </update>
+
+    <!-- 已送达的配送时间 -->
+    <update id="updateFinishedByDeliverAndOrderId">
+        update shop_comment
+          set end_time = #{endTime}
+        where order_id = #{orderId} and deliver_id = #{deliverId}
+    </update>
+
+    <update id="updateComment">
+         update shop_comment
+          set comment = #{comment}
+        where order_id = #{orderId}
+    </update>
+
+    <update id="updateAddress">
+         update shop_comment
+          set user_address = #{userAddress}
+        where id = #{id}
+    </update>
+
+
+</mapper>

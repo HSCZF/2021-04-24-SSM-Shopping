@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.czf.dao.UserDao">
+    <resultMap id="ResultMap" type="com.czf.model.User">
+        <id column="uu_id" jdbcType="INTEGER" property="id"/>
+        <result column="uu_username" jdbcType="VARCHAR" property="userName"/>
+        <result column="uu_phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="uu_password" jdbcType="VARCHAR" property="passWord"/>
+        <result column="uu_true_username" jdbcType="VARCHAR" property="trueName"/>
+        <result column="uu_sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="uu_address" jdbcType="VARCHAR" property="address"/>
+        <result column="uu_status" jdbcType="INTEGER" property="status"/>
+        <result column="uu_role" jdbcType="VARCHAR" property="role"/>
+        <result column="uu_add_time" jdbcType="TIMESTAMP" property="addTime"/>
+        <result column="uu_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <!-- 数据库addTime是Date类型，为了传入时分秒，这里变为TIMESTAMP类型，实体类仍然为Date类型，方便区分 -->
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        uu_id, uu_username, uu_phone, uu_password, uu_true_username, uu_sex, uu_address, uu_status, uu_role, uu_add_time, uu_update_time
+    </sql>
+
+    <!-- 查询所有用户 -->
+    <select id="findAllUser" parameterType="User" resultMap="ResultMap">
+        select * from User
+    </select>
+
+    <!-- 管理员管理用户 多条件模糊查询, 产品的因为没有设置resultMap，所以用resultType="User"代替
+        这里有了，所以要使用resultMap="ResultMap"，否则无法拿到数据
+     -->
+    <select id="findUsersByParams" parameterType="User" resultMap="ResultMap">
+        <!--select <include refid="Base_Column_List"/>-->
+        select * from user
+        <where>
+            <if test="userName != null and userName != ''">
+                and uu_username like concat(concat('%',#{userName}),'%')
+            </if>
+            <if test="trueName != null and trueName != ''">
+                and uu_true_username like concat(concat('%',#{trueName}),'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and uu_phone = #{phone}
+            </if>
+            <if test="address != null and address != ''">
+                and uu_address like concat(concat('%',#{address}),'%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据用户名和密码判断登陆 -->
+    <select id="selectByLoginNameAndPassword" parameterType="User" resultMap="ResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from User
+        where uu_username = #{userName} and uu_password = #{passWord}
+    </select>
+
+    <!-- 根据用户名查询用户, 返回整型，判断是否存在 -->
+    <select id="findByUserName" resultType="java.lang.Integer">
+        select count(*) from User where uu_username = #{userName,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据用户名查询用户, 返回user -->
+    <select id="findByUserNameReturnUser" parameterType="User" resultMap="ResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from User
+        where uu_username = #{userName,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据id查询用户 -->
+    <select id="getByUserId" parameterType="java.lang.Integer" resultMap="ResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from User
+        where uu_id = #{id, jdbcType=INTEGER}
+    </select>
+
+    <!-- 添加新用户 -->
+    <insert id="insertUser" parameterType="User">
+        insert into User
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userName != null">
+                uu_username,
+            </if>
+            <if test="phone != null">
+                uu_phone,
+            </if>
+            <if test="passWord != null">
+                uu_password,
+            </if>
+            <if test="trueName != null">
+                uu_true_username,
+            </if>
+            <if test="sex != null">
+                uu_sex,
+            </if>
+            <if test="address != null">
+                uu_address,
+            </if>
+            <if test="status != null">
+                uu_status,
+            </if>
+            <if test="role != null">
+                uu_role,
+            </if>
+            <if test="addTime != null">
+                uu_add_time,
+            </if>
+            <if test="updateTime != null">
+                uu_update_time
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userName != null">
+                #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="passWord != null">
+                #{passWord,jdbcType=VARCHAR},
+            </if>
+            <if test="trueName != null">
+                #{trueName,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="role != null">
+                #{role,jdbcType=VARCHAR},
+            </if>
+            <if test="addTime != null">
+                #{addTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 用户更新 -->
+    <update id="updateUser" parameterType="User">
+        update User
+        <set>
+            <if test="userName != null">
+                uu_username = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                uu_phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="passWord != null">
+                uu_password = #{passWord ,jdbcType=VARCHAR},
+            </if>
+            <if test="trueName != null">
+                uu_true_username = #{trueName ,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                uu_sex = #{sex ,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                uu_address = #{address ,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                uu_status = #{status ,jdbcType=INTEGER},
+            </if>
+            <if test="role != null">
+                uu_role = #{role ,jdbcType=VARCHAR},
+            </if>
+            <if test="addTime != null">
+                uu_add_time = #{addTime ,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                uu_update_time = #{updateTime ,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where uu_id = #{id, jdbcType=INTEGER}
+    </update>
+
+    <!-- 用户修改密码 -->
+    <update id="updateUserPassWord" parameterType="User">
+        update User
+            set uu_password = #{passWord ,jdbcType=VARCHAR}
+        where uu_id = #{id, jdbcType=INTEGER}
+    </update>
+
+    <!-- 删除单个用户 -->
+    <delete id="deleteByUserId" parameterType="java.lang.Integer">
+        delete from User
+        where uu_id = #{id, jdbcType=INTEGER}
+    </delete>
+
+    <!-- 删除多个用户 -->
+    <delete id="deleteByManyUserId" parameterType="java.lang.Integer">
+        delete from User
+        where uu_id in
+        <foreach collection="array" item="ids" index="no" open="(" separator="," close=")">
+            #{ids, jdbcType=INTEGER}
+        </foreach>
+    </delete>
+
+</mapper>

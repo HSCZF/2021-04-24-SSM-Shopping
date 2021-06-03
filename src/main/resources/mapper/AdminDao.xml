@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.czf.dao.AdminDao">
+    <resultMap id="ResultMap" type="com.czf.model.Admin">
+        <id column="ad_id" jdbcType="INTEGER" property="id"/>
+        <result column="ad_username" jdbcType="VARCHAR" property="adminName"/>
+        <result column="ad_password" jdbcType="VARCHAR" property="adminPassWord"/>
+        <result column="ad_role" jdbcType="VARCHAR" property="role"/>
+        <result column="ad_create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="ad_update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <!--    采用驼峰命名：jdbcType全大写,column使用数据库对应的名称，实体类使用property设置的名称(符合驼峰命名规范)
+            下列所有语句，{}都将采用property的方式，比如：select * from Account where user_name = {#userName};
+    -->
+    <!-- 没用实体类别名前 --><!--
+        <select id="findAll" parameterType="com.czf.model.Account" resultMap="ResultMap">
+            select * from Account;
+        </select>-->
+
+    <sql id="Base_Column_List">
+        ad_id, ad_username, ad_password, ad_role, ad_create_time, ad_update_time
+    </sql>
+    <!-- 查找所有管理员账号 -->
+    <select id="findAll" parameterType="Admin" resultMap="ResultMap">
+        select * from Admin
+    </select>
+    <!-- 管理员账号是否存在 -->
+    <select id="findByAdminName" resultType="java.lang.Integer">
+        select count(*) from Admin where ad_username = #{adminName,jdbcType=VARCHAR}
+    </select>
+    <!-- 根据id查询管理员 -->
+    <select id="getByAdminId" parameterType="java.lang.Integer" resultMap="ResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from Admin
+        where ad_id = #{id, jdbcType=INTEGER}
+    </select>
+    <!-- 添加管理员 -->
+    <insert id="insertAdmin" parameterType="Admin">
+        insert into Admin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="adminName != null">
+                ad_username,
+            </if>
+            <if test="adminPassWord != null">
+                ad_password,
+            </if>
+            <if test="role != null">
+                ad_role,
+            </if>
+            <if test="createTime != null">
+                ad_create_time,
+            </if>
+            <if test="updateTime != null">
+                ad_update_time,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="adminName != null">
+                #{adminName,jdbcType=VARCHAR},
+            </if>
+            <if test="adminPassWord != null">
+                #{adminPassWord,jdbcType=VARCHAR},
+            </if>
+            <if test="role != null">
+                #{role ,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime ,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime ,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <!-- 管理员更新 -->
+    <update id="updateAdmin" parameterType="Admin">
+        update Admin
+        <set>
+            <if test="adminName != null">
+                ad_username = #{adminName,jdbcType=VARCHAR},
+            </if>
+            <if test="adminPassWord != null">
+                ad_password = #{adminPassWord,jdbcType=VARCHAR},
+            </if>
+            <if test="role != null">
+                ad_role = #{role ,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                ad_create_time = #{createTime ,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                ad_update_time = #{updateTime ,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where ad_id = #{id, jdbcType=INTEGER}
+    </update>
+    <!-- 删除单个管理员 -->
+    <delete id="deleteByAdminId" parameterType="java.lang.Integer">
+        delete from Admin
+        where ad_id = #{id, jdbcType=INTEGER}
+    </delete>
+    <!-- 删除多个管理员 -->
+    <delete id="deleteByManyAdminId" parameterType="java.lang.Integer">
+        delete from Admin
+        where ad_id in
+        <foreach collection="array" item="ids" index="no" open="(" separator="," close=")">
+            #{ids, jdbcType=INTEGER}
+        </foreach>
+    </delete>
+
+</mapper>
